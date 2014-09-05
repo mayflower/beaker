@@ -80,9 +80,6 @@ module Beaker
     # @option opts [Beaker::Logger] :logger A {Beaker::Logger} object
     def validate_host host, opts
       logger = opts[:logger]
-      if ( opts[:collect_perf_data] and !@@additional_pkgs.include? "sysstat" )
-        @@additional_pkgs << "sysstat"
-      end
       block_on host do |host|
         case
         when host['platform'] =~ /gentoo/
@@ -97,18 +94,8 @@ module Beaker
               host.install_package pkg
             end
           end
-          @@additional_pkgs.each do |pkg|
-            if not host.check_for_package pkg
-              host.install_package pkg
-            end
-          end
         when host['platform'] =~ /debian/
           DEBIAN_PACKAGES.each do |pkg|
-            if not host.check_for_package pkg
-              host.install_package pkg
-            end
-          end
-          @@additional_pkgs.each do |pkg|
             if not host.check_for_package pkg
               host.install_package pkg
             end
@@ -121,11 +108,6 @@ module Beaker
           end
         when host['platform'] !~ /debian|aix|solaris|windows|sles-|osx-/
           UNIX_PACKAGES.each do |pkg|
-            if not host.check_for_package pkg
-              host.install_package pkg
-            end
-          end
-          @@additional_pkgs.each do |pkg|
             if not host.check_for_package pkg
               host.install_package pkg
             end
